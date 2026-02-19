@@ -1,7 +1,7 @@
 # **Medusa v1.0**
 Medusa is designed to demonstrate the vulnerability of certain IoT cameras (specifically those using AltoBeam/V380 chips) to network-based Resource Exhaustion.
 
-By leveraging hping3 to launch a high-speed SYN flood with randomized source IPs ("Phantoms"), Medusa overwhelms the device's network stack, causing the system to hang and eventually trigger a hardware watchdog reset.
+By leveraging hping3 to launch a high-speed SYN flood with randomized source IPs, Medusa overwhelms the device's network stack, causing the system to hang and eventually trigger a hardware watchdog reset.
 
 **🛠️ Prerequisites**
 You will need the following tools installed:

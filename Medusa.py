@@ -134,7 +134,7 @@ def main():
     disclaimer = (
         "[bold red]LEGAL DISCLAIMER:[/bold red]\n"
         "[dim]This tool is created strictly for educational purposes and authorized\n"
-        "security auditing. The developer is NOT responsible for any misuse,\n"
+        "security auditing. The creator is NOT responsible for any misuse,\n"
         "illegal activities, or criminality. Testing on unauthorized networks\n"
         "is strictly prohibited and may be subject to legal prosecution.[/dim]\n"
         "────────────────────────────────────────────────────────────\n"

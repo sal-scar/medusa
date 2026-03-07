@@ -44,5 +44,5 @@ Mode 1: Launches a Dual-Port SYN flood to freeze the device.
 
 Mode 2: Attempts to crack the RTSP credentials using a specified wordlist.
 
-⚠️ Legal Disclaimer
-This tool is created strictly for educational purposes and authorized security auditing. The developer is NOT responsible for any misuse, illegal activities, or criminality. Testing on unauthorized networks is strictly prohibited and may be subject to legal prosecution. Always use your own network and equipment.
+> ⚠️ Legal Disclaimer
+> This tool is created strictly for educational purposes and authorized security auditing. The developer is NOT responsible for any misuse, illegal activities, or criminality. Testing on unauthorized networks is strictly prohibited and may be subject to legal prosecution. Always use your own network and equipment.

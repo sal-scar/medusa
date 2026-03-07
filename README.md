@@ -1,43 +1,48 @@
-# **Medusa v1.0**
-Medusa is designed to demonstrate the vulnerability of certain IoT cameras (specifically those using AltoBeam/V380 chips) to network-based Resource Exhaustion.
+# **Medusa v2.0**
+Medusa is designed to demonstrate the vulnerability of certain IoT cameras (specifically those using AltoBeam/V380 chipsets) to network-based Resource Exhaustion and authentication bypasses on the RTSP protocol.
 
-By leveraging hping3 to launch a high-speed SYN flood with randomized source IPs, Medusa overwhelms the device's network stack, causing the system to hang and eventually trigger a hardware watchdog reset.
+Unlike previous versions, v2.0 features a Confidence Scoring Engine that accurately identifies targets via banner grabbing and manual handshake verification.
 
-**🛠️ Prerequisites**
-You will need the following tools installed:
+🚀 Key Features
+- Advanced Scanning: Leverages Nmap service detection to identify CCTV vendors (Dahua, Hikvision, V380) with up to 100% accuracy.
+- Confidence Scoring: Automatic grading system (Confirmed, Likely, Possible) based on open ports and service banner matches.
+- Dual-Strike Petrify (DoS): Simultaneously floods Port 554 (RTSP) and Port 8089 (Service) to overwhelm the network stack and trigger a hardware watchdog reset.
+- Brute Force: Dictionary attacks on Port 554 using a Direct Ncat Handshake method to eliminate false positives and ensure credential validity.
 
-* hping3
-* arp-scan
+🛠️ Prerequisites
+This framework requires a Linux environment with the following packages installed:
 
-Install them using:
+- nmap & ncat
+- hping3
+- python3 with the rich library
+
+Install Dependencies:
+
 ```
-sudo apt update && sudo apt install hping3 arp-scan -y
+sudo apt update && sudo apt install nmap hping3 python3-pip -y
+pip install rich
 ```
 
-**📖 How to Use**
-
+📖 How to Use
+Clone the Repository:
 ```
 git clone https://github.com/sal-scar/medusa.git
 cd medusa
-chmod +x medusa.sh
-sudo ./medusa.sh
 ```
-**⚙️ Customization (Attack & Rest Times)**
-If the attack takes too long or recovering too quickly, you can fine-tune the script. Open the script in a text editor (like nano or vim) and locate the CONFIGURATION block at the top:
+
+Launch the Tool:
 ```
-# --- CONFIGURATION ---
-CCTV_PREFIX="38:54:f5"  # AltoBeam MAC prefix
-TARGET_PORT=8089        # Target service port
-ATTACK_TIME=60          # Duration of the flood (Increase if freeze is too short)
-REST_TIME=30            # Duration of the pause (Decrease to hit it faster)
-# ---------------------
+sudo python3 medusa.py
 ```
-* ATTACK_TIME: Set this to at least 10-20 seconds longer than the time it takes for your camera to "freeze." If the camera reboots at 50 seconds, a 60 or 90 second hammer ensures it never stabilizes.
 
-* REST_TIME: This is the "breather." If your camera reboots and starts recording immediately, lower this number (e.g., 10) so the script strikes again sooner.
+⚙️ Workflow
+- Scanning: Medusa scans the network and filters out any results with a 0% confidence score.
+- Analysis: The tool provides a "Reasoning" column explaining exactly why a device was flagged as a CCTV.
+- Execution:
 
+Mode 1: Launches a Dual-Port SYN flood to freeze the device.
 
+Mode 2: Attempts to crack the RTSP credentials using a specified wordlist.
 
-> ⚠️ Disclaimer
-> EDUCATIONAL PURPOSES ONLY. This tool is intended for legal, authorized security testing in a controlled lab environment. Unauthorized access to or disruption of computer systems is illegal. The author is not >
-> responsible for any misuse. This script was tested specifically on AltoBeam/V380 hardware; it is NOT a universal exploit.
+⚠️ Legal Disclaimer
+This tool is created strictly for educational purposes and authorized security auditing. The developer is NOT responsible for any misuse, illegal activities, or criminality. Testing on unauthorized networks is strictly prohibited and may be subject to legal prosecution. Always use your own network and equipment.
